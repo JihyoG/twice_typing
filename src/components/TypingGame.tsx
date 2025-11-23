@@ -138,11 +138,15 @@ const TypingGame: React.FC = () => {
         ) : (
           words.slice(currentWordIndex, currentWordIndex + 20).map((word, index) => {
             const isCurrent = index === 0;
+            const isTypingCorrect = word.startsWith(currentInput);
             return (
               <span
                 key={index}
                 className={`text-2xl transition-all duration-200 ${isCurrent
-                  ? 'text-neon-magenta font-bold scale-110 bg-soft-pink/30 px-2 rounded-lg'
+                  ? `font-bold scale-110 px-2 rounded-lg ${isTypingCorrect
+                    ? 'text-neon-magenta bg-soft-pink/30'
+                    : 'text-red-700 bg-soft-pink/30'
+                  }`
                   : 'text-gray-400'
                   }`}
               >
