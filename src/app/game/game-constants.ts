@@ -1,4 +1,4 @@
-import { thisIsFor } from "./music-lyrics/this-is-for";
+import { thisIsFor, thisIsForVideoId } from "./music-lyrics/this-is-for";
 
 
-export { thisIsFor };
+export { thisIsFor, thisIsForVideoId };

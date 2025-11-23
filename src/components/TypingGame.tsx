@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { thisIsFor } from '@/app/game/game-constants';
+import { thisIsFor, thisIsForVideoId } from '@/app/game/game-constants';
 
 const GAME_DURATION = 60;
 
@@ -15,6 +15,43 @@ const TypingGame: React.FC = () => {
   const [isGameActive, setIsGameActive] = useState(false);
   const [isGameFinished, setIsGameFinished] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const playerRef = useRef<any>(null);
+
+  useEffect(() => {
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+
+    (window as any).onYouTubeIframeAPIReady = () => {
+      playerRef.current = new (window as any).YT.Player('youtube-player', {
+        videoId: thisIsForVideoId,
+        playerVars: {
+          'playsinline': 1,
+          'controls': 0,
+          'disablekb': 1,
+        },
+        events: {
+          'onReady': onPlayerReady,
+        }
+      });
+    };
+
+    return () => {
+      if (playerRef.current) {
+        playerRef.current.destroy();
+      }
+    };
+  }, []);
+
+  const onPlayerReady = (event: any) => {
+  };
+
+  useEffect(() => {
+    if (isGameActive && playerRef.current && playerRef.current.playVideo) {
+      playerRef.current.playVideo();
+    }
+  }, [isGameActive]);
 
   const chunkArray = <T,>(arr: T[], size: number): T[][] => {
     const result: T[][] = [];
@@ -106,6 +143,10 @@ const TypingGame: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center w-full max-w-2xl mx-auto space-y-8">
+      {/* YouTube Embed */}
+      <div className="w-full aspect-video rounded-2xl overflow-hidden shadow-lg border-2 border-deep-purple/20">
+        <div id="youtube-player" className="w-full h-full"></div>
+      </div>
       {/* Header / Stats */}
       <div className="flex justify-between w-full px-4 py-2 bg-white/50 rounded-2xl backdrop-blur-sm shadow-sm">
         <div className="flex flex-col items-center">
