@@ -31,9 +31,6 @@ const TypingGame: React.FC = () => {
           'controls': 0,
           'disablekb': 1,
         },
-        events: {
-          'onReady': onPlayerReady,
-        }
       });
     };
 
@@ -43,9 +40,6 @@ const TypingGame: React.FC = () => {
       }
     };
   }, []);
-
-  const onPlayerReady = (event: any) => {
-  };
 
   useEffect(() => {
     if (isGameActive && playerRef.current && playerRef.current.playVideo) {
