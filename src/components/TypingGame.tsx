@@ -15,7 +15,7 @@ const TypingGame: React.FC = () => {
   const [isGameActive, setIsGameActive] = useState(false);
   const [isGameFinished, setIsGameFinished] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const playerRef = useRef<any>(null);
+  const playerRef = useRef<YTPlayer | null>(null);
 
   useEffect(() => {
     const tag = document.createElement('script');
@@ -23,14 +23,15 @@ const TypingGame: React.FC = () => {
     const firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
 
-    (window as any).onYouTubeIframeAPIReady = () => {
-      playerRef.current = new (window as any).YT.Player('youtube-player', {
+    window.onYouTubeIframeAPIReady = () => {
+      playerRef.current = new window.YT.Player('youtube-player', {
         videoId: thisIsForVideoId,
         playerVars: {
           'playsinline': 1,
           'controls': 0,
           'disablekb': 1,
         },
+
       });
     };
 
@@ -42,7 +43,7 @@ const TypingGame: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (isGameActive && playerRef.current && playerRef.current.playVideo) {
+    if (isGameActive && playerRef.current) {
       playerRef.current.playVideo();
     }
   }, [isGameActive]);
