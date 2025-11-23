@@ -1,14 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-
-const WORDS = [
-  "twice", "once", "fancy", "feel", "special", "cheer", "up", "like", "ooh", "ahh",
-  "signal", "heart", "shaker", "dance", "night", "away", "yes", "or", "more",
-  "alcohol", "free", "scientist", "talk", "that", "moonlight", "sunrise", "candy", "pop",
-  "jihyo", "nayeon", "jeongyeon", "momo", "sana", "mina", "dahyun", "chaeyoung", "tzuyu",
-  "love", "music", "kpop", "idol", "stage", "performance", "fandom", "lightstick"
-];
+import { thisIsFor } from '@/app/game/game-constants';
 
 const GAME_DURATION = 60;
 
@@ -23,10 +16,30 @@ const TypingGame: React.FC = () => {
   const [isGameFinished, setIsGameFinished] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const chunkArray = <T,>(arr: T[], size: number): T[][] => {
+    const result: T[][] = [];
+    for (let i = 0; i < arr.length; i += size) {
+      result.push(arr.slice(i, i + size));
+    }
+    return result;
+  };
+
+  const shuffle = <T,>(array: T[]): T[] => {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  };
+
   const shuffleWords = useCallback(() => {
-    const shuffled = [...WORDS].sort(() => Math.random() - 0.5);
-    setWords(shuffled);
-  }, []);
+    const chunks = chunkArray(thisIsFor, 15);
+    const shuffledChunks = shuffle(chunks);
+    const flattened = shuffledChunks.flat();
+    setWords(flattened);
+  }, [thisIsFor]);
+
 
   useEffect(() => {
     shuffleWords();
@@ -60,21 +73,21 @@ const TypingGame: React.FC = () => {
     if (!isGameActive && !isGameFinished) {
       setIsGameActive(true);
     }
-    
+
     if (isGameFinished) return;
 
     const value = e.target.value;
-    
+
     if (value.endsWith(' ')) {
       const wordToCheck = value.trim();
       const currentTargetWord = words[currentWordIndex];
-      
+
       if (wordToCheck === currentTargetWord) {
         setCorrectWords((prev) => prev + 1);
       } else {
         setIncorrectWords((prev) => prev + 1);
       }
-      
+
       setCurrentWordIndex((prev) => prev + 1);
       setCurrentInput('');
     } else {
@@ -115,7 +128,7 @@ const TypingGame: React.FC = () => {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 z-20 animate-fade-in">
             <h2 className="text-3xl font-bold text-deep-purple mb-2">Game Over!</h2>
             <p className="text-lg text-gray-600 mb-6">You typed <span className="font-bold text-neon-magenta">{correctWords}</span> words correctly.</p>
-            <button 
+            <button
               onClick={startGame}
               className="px-8 py-3 bg-gradient-to-r from-neon-magenta to-apricot text-white font-bold rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
             >
@@ -126,20 +139,19 @@ const TypingGame: React.FC = () => {
           words.slice(currentWordIndex, currentWordIndex + 20).map((word, index) => {
             const isCurrent = index === 0;
             return (
-              <span 
-                key={index} 
-                className={`text-2xl transition-all duration-200 ${
-                  isCurrent 
-                    ? 'text-neon-magenta font-bold scale-110 bg-soft-pink/30 px-2 rounded-lg' 
-                    : 'text-gray-400'
-                }`}
+              <span
+                key={index}
+                className={`text-2xl transition-all duration-200 ${isCurrent
+                  ? 'text-neon-magenta font-bold scale-110 bg-soft-pink/30 px-2 rounded-lg'
+                  : 'text-gray-400'
+                  }`}
               >
                 {word}
               </span>
             );
           })
         )}
-        
+
         {/* Hidden Input */}
         <input
           ref={inputRef}
@@ -156,10 +168,10 @@ const TypingGame: React.FC = () => {
       <div className="h-12 w-full max-w-md">
         {!isGameFinished && (
           <div className="w-full text-center">
-             <span className="text-3xl font-bold text-deep-purple border-b-2 border-apricot pb-1 min-w-[20px] inline-block">
-               {currentInput}
-               <span className="animate-pulse text-neon-magenta">|</span>
-             </span>
+            <span className="text-3xl font-bold text-deep-purple border-b-2 border-apricot pb-1 min-w-[20px] inline-block">
+              {currentInput}
+              <span className="animate-pulse text-neon-magenta">|</span>
+            </span>
           </div>
         )}
       </div>
